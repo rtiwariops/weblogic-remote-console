@@ -115,6 +115,10 @@ export const PerformancePage = ({ source }: Props) => {
       fetchSnapshot: () => source.fetchSnapshot(),
       intervalMs: loadPollInterval(),
       capacity: HISTORY_POINTS,
+      // Like the 8.1 console's graph applet, keep sampling while the page is
+      // open even if the window is covered or in the background; polling
+      // stops when the user leaves the page (dispose on unmount).
+      visibility: null,
       onChange: () => {
         setNow(Date.now());
         setTick((n) => n + 1);
