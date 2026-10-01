@@ -23,6 +23,7 @@ import FormToolbar from "./formtoolbar";
 import TableToolbar from "../table/table-toolbar";
 import FieldSettingsDialog from "./field-settings-dialog";
 import SliceTable from "./slicetable";
+import { PerformanceSlice, performanceKeyOf } from "../lifeline/performance-data";
 import Tabs from "./tabs";
 import Breadcrumbs from "../breadcrumbs";
 import { Help } from "../shared/help";
@@ -172,6 +173,19 @@ export const FormContainer = ({ model, pageContext }: Props) => {
     if (contentModel instanceof TableContentModel) {
       return <SliceTable tableModel={contentModel as TableContentModel} pageContext={pageContext} onSelectionChanged={(keys: KeySetImpl<string>) => setSelectedKeys(keys)} />;
     } else if (contentModel instanceof FormContentModel) {
+      if (contentModel.pdj?.sliceForm?.presentation?.lifeline) {
+        const self = contentModel.getSelfResourceData();
+        const performanceKey = self ? performanceKeyOf(self) : undefined;
+
+        if (self && performanceKey) {
+          return (
+            <PerformanceSlice
+              selfUrl={self}
+              seriesKey={performanceKey}
+            />
+          );
+        }
+      }
       return <Form formModel={contentModel} setModel={setModel} />;
     } else {
       return <></>;

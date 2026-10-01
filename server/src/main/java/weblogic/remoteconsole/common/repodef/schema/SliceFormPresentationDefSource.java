@@ -13,6 +13,7 @@ import weblogic.console.schema.YamlSource;
 public class SliceFormPresentationDefSource extends YamlSource {
   private BooleanValue useCheckBoxesForBooleans = BooleanValue.create();
   private BooleanValue singleColumn = BooleanValue.create();
+  private BooleanValue lifeline = BooleanValue.create();
 
   // Whether to display boolean properties on this form as check boxes.
   // If not specified, they're displayed as sliders.
@@ -35,5 +36,15 @@ public class SliceFormPresentationDefSource extends YamlSource {
 
   public void setSingleColumn(boolean val) {
     singleColumn = singleColumn.setValue(val);
+  }
+
+  // Whether to render this slice as live, WebLogic 8.1-style performance
+  // graphs (the "Lifeline") instead of a form.
+  public boolean isLifeline() {
+    return lifeline.getValue();
+  }
+
+  public void setLifeline(boolean val) {
+    lifeline = lifeline.setValue(val);
   }
 }
