@@ -494,6 +494,7 @@ public class PageDescription {
     JsonObjectBuilder builder = Json.createObjectBuilder();
     addIfTrue(builder, "singleColumn", singleColumn);
     addIfTrue(builder, "useCheckBoxesForBooleans", presentationDef.isUseCheckBoxesForBooleans());
+    addIfTrue(builder, "lifeline", presentationDef.isLifeline());
     return builder.build();
   }
 

@@ -21,4 +21,8 @@ public interface SliceFormPresentationDef {
   // Returns whether the properties on this page should be
   // displayed in a single column.  The default is two columns.
   public boolean isSingleColumn();
+
+  // Returns whether this slice should be rendered as the live
+  // WebLogic 8.1-style performance graphs instead of a form.
+  public boolean isLifeline();
 }

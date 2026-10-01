@@ -40,4 +40,9 @@ class SliceFormPresentationDefImpl implements SliceFormPresentationDef {
   public boolean isSingleColumn() {
     return source.isSingleColumn();
   }
+
+  @Override
+  public boolean isLifeline() {
+    return source.isLifeline();
+  }
 }

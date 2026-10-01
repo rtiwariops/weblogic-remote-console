@@ -29,6 +29,7 @@ export interface HelpTopic {
 export interface Presentation {
     singleColumn?: boolean;
     width?: string;
+    lifeline?: boolean;
 }
 
 export interface CreateForm {
