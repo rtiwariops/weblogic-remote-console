@@ -18,13 +18,31 @@ export const reloadUrl = (url: string): string => {
   return u.pathname + u.search + u.hash;
 };
 
+// On the Monitoring Tree's Servers > <server> page the slice belongs to the
+// combined running-server bean, which renames every ServerRuntime property
+// to "ServerRuntime.<name>" (see CombinedServerRuntimeMBeanYamlReader).
+const DELEGATED_SERVER_RUNTIME_PREFIX = "ServerRuntime.";
+
+/**
+ * Maps an RDJ data key back to its property path. The backend names each
+ * value after the property path with "_" separators
+ * (BeanPropertyDefImpl.getFormFieldName), e.g.
+ * "ServerRuntime_JVMRuntime_HeapFreeCurrent" -> "JVMRuntime.HeapFreeCurrent".
+ */
+export const toPropertyPath = (formFieldName: string): string => {
+  const path = formFieldName.split("_").join(".");
+  return path.startsWith(DELEGATED_SERVER_RUNTIME_PREFIX)
+    ? path.substring(DELEGATED_SERVER_RUNTIME_PREFIX.length)
+    : path;
+};
+
 /** Flattens an RDJ's slice data to { "JVMRuntime.HeapFreeCurrent": 123, ... }. */
 export const toSnapshot = (rdj: RDJ): RawSnapshot => {
   const snapshot: RawSnapshot = {};
   const data = rdj?.data;
   if (data && !Array.isArray(data)) {
     for (const [name, holder] of Object.entries(data as Record<string, PropertyValueHolder>)) {
-      snapshot[name] = holder?.value;
+      snapshot[toPropertyPath(name)] = holder?.value;
     }
   }
   return snapshot;

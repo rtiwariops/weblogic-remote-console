@@ -4,7 +4,7 @@
  * The Universal Permissive License (UPL), Version 1.0
  */
 
-import { performanceKeyOf, reloadUrl, toSnapshot } from "../performance-data";
+import { performanceKeyOf, reloadUrl, toPropertyPath, toSnapshot } from "../performance-data";
 import { heapUsed } from "../performance-page";
 import { RDJ } from "wrc/shared/typedefs/rdj";
 
@@ -47,6 +47,33 @@ describe("performance data", () => {
       "ThreadPoolRuntime.QueueLength": 0,
     });
     expect(toSnapshot({} as RDJ)).toEqual({});
+  });
+
+  it("reads the property names of a real WLS 14.1.2 Servers > ms1 > Performance response", () => {
+    const rdj = {
+      data: {
+        ServerRuntime_ThreadPoolRuntime_ExecuteThreadIdleCount: { value: 0 },
+        ServerRuntime_ThreadPoolRuntime_QueueLength: { value: 0 },
+        ServerRuntime_ThreadPoolRuntime_CompletedRequestCount: { value: 20775 },
+        ServerRuntime_JVMRuntime_HeapFreeCurrent: { value: 389467928 },
+        ServerRuntime_JVMRuntime_HeapSizeCurrent: { value: 849346560 },
+      },
+    } as unknown as RDJ;
+    const snapshot = toSnapshot(rdj);
+    expect(snapshot).toEqual({
+      "ThreadPoolRuntime.ExecuteThreadIdleCount": 0,
+      "ThreadPoolRuntime.QueueLength": 0,
+      "ThreadPoolRuntime.CompletedRequestCount": 20775,
+      "JVMRuntime.HeapFreeCurrent": 389467928,
+      "JVMRuntime.HeapSizeCurrent": 849346560,
+    });
+    expect(heapUsed(snapshot)).toBe(849346560 - 389467928);
+  });
+
+  it("maps form field names to property paths", () => {
+    expect(toPropertyPath("JVMRuntime_HeapFreeCurrent")).toBe("JVMRuntime.HeapFreeCurrent");
+    expect(toPropertyPath("ServerRuntime_JVMRuntime_HeapFreeCurrent")).toBe("JVMRuntime.HeapFreeCurrent");
+    expect(toPropertyPath("JVMRuntime.HeapFreeCurrent")).toBe("JVMRuntime.HeapFreeCurrent");
   });
 
   it("plots Memory Usage as heap in use", () => {
