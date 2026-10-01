@@ -92,7 +92,7 @@ export const PerformancePage = ({ source }: Props) => {
   const [, setTick] = useState(0);
   const [showPrefs, setShowPrefs] = useState(false);
   const [gcRunning, setGcRunning] = useState(false);
-  const [gcFailed, setGcFailed] = useState(false);
+  const [gcProblem, setGcProblem] = useState<"failed" | "unavailable" | null>(null);
   const samplerRef = useRef<LifelineSampler | null>(null);
   const heapSizeRef = useRef<number | undefined>(undefined);
   const [intervalInput, setIntervalInput] = useState("");
@@ -160,10 +160,10 @@ export const PerformancePage = ({ source }: Props) => {
   const onForceGC = () => {
     if (!source.forceGC) return;
     setGcRunning(true);
-    setGcFailed(false);
+    setGcProblem(null);
     source
       .forceGC()
-      .catch(() => setGcFailed(true))
+      .catch((err) => setGcProblem((err as { unavailable?: boolean })?.unavailable ? "unavailable" : "failed"))
       .finally(() => setGcRunning(false));
   };
 
@@ -221,12 +221,18 @@ export const PerformancePage = ({ source }: Props) => {
         <button
           type="button"
           class="wrc-lifeline-button"
-          disabled={!source.forceGC || gcRunning}
+          disabled={!source.forceGC || gcRunning || status !== "LIVE"}
           onClick={onForceGC}
         >
           {labels.forceGC}
         </button>
-        {gcFailed ? <span class="wrc-lifeline-gc-failed">{labels.gcFailed}</span> : <></>}
+        {gcProblem ? (
+          <span class="wrc-lifeline-gc-failed">
+            {gcProblem === "unavailable" ? labels.gcUnavailable : labels.gcFailed}
+          </span>
+        ) : (
+          <></>
+        )}
       </div>
 
       <div class="wrc-lifeline-prefs">
